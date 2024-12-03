@@ -20,21 +20,27 @@ def send_invitation_email(payload: InvitePayload, image_data: bytes, image_filen
         msg['Subject'] = "Invitation to Review API Documentation"
         
         body = f"""
-        Dear Team,
-        
-        Please find below the details to review my solution for the provided task:
-        
-        - API Documentation (Redoc) : {payload.redoc_link}
-        - Swagger Documentation : {payload.swagger_link}
-        - Github Repository : {payload.github_code_link}
-        
-        Additionally I have attached the screenshot of GCP Firestore Database.
-        
-        Thanks and Best Regards,
-        Soundarya G
+        <html>
+            <body>
+                <p>Dear Team,</p>
+                
+                <p>Please find below the details to review my solution for the provided task:</p>
+                
+                <ul>
+                    <li><a href="{payload.redoc_link}">API Documentation (Redoc)</a></li>
+                    <li><a href="{payload.swagger_link}">Swagger Documentation</a></li>
+                    <li><a href="{payload.github_code_link}">Github Repository</a></li>
+                </ul>
+                
+                <p>Additionally, I have attached the screenshot of GCP Firestore Database.</p>
+                
+                <p>Thanks and Best Regards,</p>
+                <p>Soundarya G</p>
+            </body>
+        </html>
         """
         
-        msg.attach(MIMEText(body,"plain"))
+        msg.attach(MIMEText(body,"html"))
         
         image = MIMEImage(image_data, name = image_filename)
         msg.attach(image)
