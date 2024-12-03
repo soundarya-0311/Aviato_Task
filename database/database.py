@@ -1,5 +1,7 @@
+import os
 from google.cloud import firestore
 
-client = firestore.Client.from_service_account_json("phrasal-chiller-443513-u1-1eb39beb218a.json")
+credential_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+client = firestore.Client.from_service_account_json(credential_path)
 
 db = client.collection("users")

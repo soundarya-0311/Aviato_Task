@@ -1,8 +1,11 @@
 import traceback
-from fastapi import APIRouter,status,HTTPException
+from typing import List
+from fastapi import APIRouter,status,HTTPException,UploadFile,File,Form
+from pydantic import EmailStr
 from fastapi.responses import JSONResponse
-from schemas.schemas import Users
+from schemas.schemas import Users,InvitePayload
 from database.database import db
+from utilities.email_utils import send_invitation_email
 
 router = APIRouter()
 
@@ -110,3 +113,39 @@ def delete_users(user_id: str):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content = {"message" : "Something Went Wrong"}
         )
+
+@router.post("/send_invite")
+async def send_invite(recipient_email : List[EmailStr] = Form(...),
+                      redoc_link : str = Form(None),
+                      swagger_link: str = Form(None),
+                      github_code_link: str = Form(None),
+                      image: UploadFile = File(...)):
+    try:
+        image_data = await image.read()
+        image_filename = image.filename
+        payload = InvitePayload(
+            recipient_email=recipient_email,
+            redoc_link=redoc_link,
+            swagger_link=swagger_link,
+            github_code_link=github_code_link
+        )
+        
+        response = send_invitation_email(payload, image_data, image_filename)
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content = response
+        )
+    
+    except HTTPException as e:
+        traceback.print_exc()
+        return JSONResponse(
+            status_code=e.status_code,
+            content=e.detail
+        )
+    except Exception:
+        traceback.print_exc()
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content = {"message" : "Something Went Wrong"}
+        )       
+        
