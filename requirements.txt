@@ -4,3 +4,5 @@ google-cloud-firestore == 2.19.0
 SMTPEmail == 0.4.2
 python-multipart == 0.0.19
 pydantic[email]
+gunicorn
+google-cloud-storage
