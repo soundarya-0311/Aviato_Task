@@ -115,21 +115,22 @@ def delete_users(user_id: str):
         )
 
 @router.post("/send_invite")
-async def send_invite(recipient_email : List[EmailStr] = Form(...),
+async def send_invite(recipient_email : str = Form(...),
                       redoc_link : str = Form(None),
                       swagger_link: str = Form(None),
                       github_code_link: str = Form(None),
                       image: UploadFile = File(...)):
     try:
+        recipient_email_list = recipient_email.split(',')            
         image_data = await image.read()
         image_filename = image.filename
         payload = InvitePayload(
-            recipient_email=recipient_email,
+            recipient_email=recipient_email_list,
             redoc_link=redoc_link,
             swagger_link=swagger_link,
             github_code_link=github_code_link
         )
-        
+
         response = send_invitation_email(payload, image_data, image_filename)
         return JSONResponse(
             status_code=status.HTTP_200_OK,

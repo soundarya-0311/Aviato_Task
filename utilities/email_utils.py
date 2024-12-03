@@ -15,42 +15,41 @@ def send_invitation_email(payload: InvitePayload, image_data: bytes, image_filen
         sender_password = os.getenv("SENDER_PASSWORD")
         server.login(sender_email,sender_password)
         
-        msg = MIMEMultipart()
-        msg['From'] = sender_email
-        msg['Subject'] = "Invitation to Review API Documentation"
-        
-        body = f"""
-        <html>
-            <body>
-                <p>Dear Team,</p>
-                
-                <p>Please find below the details to review my solution for the provided task:</p>
-                
-                <ul>
-                    <li><a href="{payload.redoc_link}">API Documentation (Redoc)</a></li>
-                    <li><a href="{payload.swagger_link}">Swagger Documentation</a></li>
-                    <li><a href="{payload.github_code_link}">Github Repository</a></li>
-                </ul>
-                
-                <p>Additionally, I have attached the screenshot of GCP Firestore Database.</p>
-                
-                <p>Thanks and Best Regards,</p>
-                <p>Soundarya G</p>
-            </body>
-        </html>
-        """
-        
-        msg.attach(MIMEText(body,"html"))
-        
-        image = MIMEImage(image_data, name = image_filename)
-        msg.attach(image)
-        
         for recipient in payload.recipient_email:
-            msg["To"] = recipient
+            msg = MIMEMultipart()
+            msg['From'] = sender_email
+            msg['To'] = recipient
+            msg['Subject'] = "Invitation to Review API Documentation"
+            
+            body = f"""
+            <html>
+                <body>
+                    <p>Dear Team,</p>
+                    
+                    <p>Please find below the details to review my solution for the provided task:</p>
+                    
+                    <ul>
+                        <li><a href="{payload.redoc_link}">API Documentation (Redoc)</a></li>
+                        <li><a href="{payload.swagger_link}">Swagger Documentation</a></li>
+                        <li><a href="{payload.github_code_link}">Github Repository</a></li>
+                    </ul>
+                    
+                    <p>Additionally, I have attached the screenshot of GCP Firestore Database.</p>
+                    
+                    <p>Thanks and Best Regards,</p>
+                    <p>Soundarya G</p>
+                </body>
+            </html>
+            """
+            
+            msg.attach(MIMEText(body,"html"))
+            
+            image = MIMEImage(image_data, name = image_filename)
+            msg.attach(image)
             server.sendmail(sender_email, recipient, msg.as_string())
-        
+            
         server.quit()
-        
+            
         return {"message" : "Invitation email sent successfully"}
     
     except Exception as e:
