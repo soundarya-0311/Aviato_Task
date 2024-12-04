@@ -2,7 +2,6 @@
 __pycache__
 phrasal-chiller-443513-u1-1eb39beb218a.json
 .env
-Dockerfile
 app.yaml
 .dockerignore
 .env.development
